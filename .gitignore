@@ -1,0 +1,29 @@
+# Node
+node_modules/
+dist/
+build/
+
+# Env
+.env
+.env.*    # لو عندك ملفات env مختلفة
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS / editors
+.DS_Store
+.vscode/
+.idea/
+
+# TypeScript
+*.tsbuildinfo
+
+# test coverage
+coverage/
+
+# misc
+uploads/
+*.local
