@@ -42,7 +42,7 @@ export const userSchema = new mongoose.Schema<IUser>({
   confirmEmailOTP :  String ,
   confirmAt : Date,
   resetPasswordOTP : String,
-  changeCredentilesTime : String,
+  changeCredentilesTime : Date,
   phone : String,
   address : String,
   gender : {type:String,enum:Object.values(genderEnum),default:genderEnum.Male},

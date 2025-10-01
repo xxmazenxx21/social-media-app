@@ -5,7 +5,8 @@ import {config} from 'dotenv';
 import cors from 'cors'
 import helmet from 'helmet';
 import rateLimit  ,  {RateLimitRequestHandler}from 'express-rate-limit';
-import authRouter from './modules/auth/auth.controller';
+import authRouter from './modules/auth/auth.controller';        
+import userRouter from './modules/user/user.controller';
 import { ErrorHandler } from './utils/response/error.response';
 import connectDB from './DB/connection';
 config({path:path.resolve('./config/.env.dev')});
@@ -30,11 +31,9 @@ app.use(limiter);
 await connectDB();
 
 
-app.get('/users',(req:Request,res:Response)=>{
-    res.status(200).json({message:'hello from ts'})
-})
 
 app.use('/api/auth',authRouter);
+app.use('/api/user',userRouter);
 
 
 

@@ -2,11 +2,20 @@ import {sign,Secret,SignOptions, verify, JwtPayload} from 'jsonwebtoken'
 import {HUserDocument, RoleEnum, UserModel} from '../../DB/Models/User.model'
 import { NotFoundException, unAuthoriazedException } from "../response/error.response"
 import { UserRepository } from '../../DB/repositories/User.repository'
-
+import { TokenRepository } from '../../DB/repositories/Token.repository'
+import { TokenModel } from '../../DB/Models/token.model'
+import {v4 as uuid} from 'uuid'
 export enum SignatureLevelEnum  {
     User ="User",
     Admin = "Admin"
 }
+
+
+export enum logOutEnum  {
+    Only ="only",
+    All = "all"
+}
+
 
 export enum tokentypeEnum  {
     Access ="Access",
@@ -87,10 +96,10 @@ export const createLoginCredentials = async(user: HUserDocument)=>{
 
 const SignatureLevel = await getSingaturelevel(user.role); 
 const Signatuers = await getSignature(SignatureLevel); 
+const jwtid = uuid();
+const accessToken = await generateToken({payload:{_id:user._id},secret:Signatuers.accessSignature , options:{expiresIn:Number(process.env.ACCESS_EXPIRES_IN),jwtid}})
 
-const accessToken = await generateToken({payload:{_id:user._id},secret:Signatuers.accessSignature , options:{expiresIn:Number(process.env.ACCESS_EXPIRES_IN)}})
-
-const refreshToken = await generateToken({payload:{_id:user._id},secret:Signatuers.refreshSignature , options:{expiresIn:Number(process.env.REFRESH_EXPIRES_IN)}})
+const refreshToken = await generateToken({payload:{_id:user._id},secret:Signatuers.refreshSignature , options:{expiresIn:Number(process.env.REFRESH_EXPIRES_IN),jwtid}})
 
 return {accessToken,refreshToken}; 
 
@@ -100,7 +109,7 @@ return {accessToken,refreshToken};
 
 export const decodedToken = async({authorization , tokentype= tokentypeEnum.Access}:{authorization:string,tokentype?:tokentypeEnum })=>{
 const usermodel = new UserRepository(UserModel);
-
+const tokenmodel = new TokenRepository(TokenModel);
 
 
     const [bearer,token] = authorization.split(" ");
@@ -110,9 +119,38 @@ const signature = await getSignature(bearer as SignatureLevelEnum);
 const decoded = await verifyToken({token,secret:tokentype===tokentypeEnum.Refresh?signature.refreshSignature:signature.accessSignature})
 if(!decoded?._id||!decoded?.iat)
     throw new unAuthoriazedException("invalid token payload");
+
+if(await tokenmodel.findone({filter:{jti:decoded.jti}}))
+    throw new unAuthoriazedException("token is invalid credentials ");
+
 const user = await usermodel.findone({filter:{_id:decoded._id}})
+
+if(user?.changeCredentilesTime || 0 > decoded?.iat*1000)
+    throw new unAuthoriazedException("token is invalid credentials");
 if(!user)throw new NotFoundException("user not found ")
 return {user,decoded};
 
+
+};
+
+
+
+export const revokeToken = async(decoded : JwtPayload) => {
+    const tokenmodel = new TokenRepository(TokenModel);
+    const [result] =  await tokenmodel.create({
+        data: [
+          {
+            jti: decoded?.jti as string,
+            userId: decoded?.id,
+            expiresIn:
+              (decoded?.iat as number) +
+              Number(process.env.ACCESS_EXPIRES_IN),
+          },
+        ],
+        options: { validateBeforeSave: true },
+      }) ||[];
+
+      if(!result)throw new NotFoundException("filed to revoke token ");
+return result ;
 
 };
