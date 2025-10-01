@@ -1,4 +1,4 @@
-import mongoose, { model, models, Types } from "mongoose" 
+import mongoose, { HydratedDocument, model, models, Types } from "mongoose" 
 
 
 export enum genderEnum {
@@ -70,3 +70,7 @@ this.set({firstName,lastName})
 
 
 export const UserModel = models.User || model<IUser>("User",userSchema);
+
+
+export type HUserDocument = HydratedDocument<IUser> 
+ 

@@ -29,6 +29,21 @@ export class ConfilectException extends ApplicationException {
 }
 
 
+export class unAuthoriazedException extends ApplicationException {
+  constructor(message: string, options?: ErrorOptions) {
+      super(message, 401, options);
+  }
+}
+
+
+export class forbiddenException extends ApplicationException {
+  constructor(message: string, options?: ErrorOptions) {
+      super(message, 403, options);
+  }
+}
+
+
+
 
 
 export class NotFoundException extends ApplicationException {

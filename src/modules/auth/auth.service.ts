@@ -6,7 +6,8 @@ import { UserRepository } from "../../DB/repositories/User.repository";
 import { compareHash,  generateHash } from "../../utils/security/hash";
 import { emailEvent } from "../../utils/events/sendEmail.event";
 import { generateotp } from "../../utils/generate.otp";
-import { generateToken } from "../../utils/token/token";
+import { createLoginCredentials} from "../../utils/token/token"
+
 
 class AuthenticationService {
   private _userModel = new UserRepository(UserModel);
@@ -60,9 +61,9 @@ if(!user)
 if(!compareHash(password,user.password))
   throw new BadRequestException("invalid password");
 
-const Accesstoken = await generateToken({payload:{_id:user._id}})
+const Creadentials = await createLoginCredentials(user);
 
-    return res.status(200).json({ message: "user login succesfuly",Accesstoken });
+    return res.status(200).json({ message: "user login succesfuly",Creadentials });
   };
 
 
