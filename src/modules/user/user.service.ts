@@ -1,8 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { logOutEnum, revokeToken } from "../../utils/token/token";
 import type { ILogoutDTO } from "./user.dto";
-import { TokenModel } from "../../DB/Models/token.model";
-import { TokenRepository } from "../../DB/repositories/Token.repository";
 import { UpdateQuery } from "mongoose";
 import { IUser } from "../../DB/Models/User.model";
 import { UserRepository } from "../../DB/repositories/User.repository";
@@ -10,10 +8,12 @@ import { UserModel } from "../../DB/Models/User.model";
 import { createLoginCredentials } from "../../utils/token/token";
 import { HUserDocument } from "../../DB/Models/User.model";
 import { JwtPayload } from "jsonwebtoken";
+import { uploadFile, uploadFiles } from "../../utils/mullter/s3.config";
+
 class UserService {
   constructor() {}
 
-  private _tokenmodel = new TokenRepository(TokenModel);
+  
   private _usermodel = new UserRepository(UserModel);
 
 
@@ -74,6 +74,7 @@ class UserService {
 
 
 
+
   RefreshToken = async (
     req: Request,
     res: Response,
@@ -88,6 +89,36 @@ class UserService {
     return res
       .status(201)
       .json({ message: "new credentials",data:Credentials  });
+  };
+
+
+
+  profileImage = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response> => {
+
+    const key = await uploadFile({file:req.file as Express.Multer.File , path:`user/${req.decoded?._id}`})
+    return res
+      .status(200)
+      .json({ message: "profile image updated", key });
+  };
+
+
+
+
+  
+  coverimagesUpload = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response> => {
+
+   const keys = await uploadFiles({files:req.files as Express.Multer.File[] , path:`user/${req.decoded?._id}`})
+    return res
+      .status(200)
+      .json({ message: "profile image updated", keys });
   };
 
 
