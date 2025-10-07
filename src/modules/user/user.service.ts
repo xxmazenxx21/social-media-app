@@ -8,7 +8,7 @@ import { UserModel } from "../../DB/Models/User.model";
 import { createLoginCredentials } from "../../utils/token/token";
 import { HUserDocument } from "../../DB/Models/User.model";
 import { JwtPayload } from "jsonwebtoken";
-import { uploadFile, uploadFiles } from "../../utils/mullter/s3.config";
+import { PreSignedUrl, uploadFile, uploadFiles } from "../../utils/mullter/s3.config";
 
 class UserService {
   constructor() {}
@@ -99,10 +99,13 @@ class UserService {
     next: NextFunction
   ): Promise<Response> => {
 
-    const key = await uploadFile({file:req.file as Express.Multer.File , path:`user/${req.decoded?._id}`})
+    // const key = await uploadFile({file:req.file as Express.Multer.File , path:`user/${req.decoded?._id}`})
+
+    const {originalname , ContentType} :{originalname : string , ContentType : string}= req.body ; 
+    const {url,key}= await PreSignedUrl({originalname , ContentType,path:`user/${req.decoded?._id}`})
     return res
       .status(200)
-      .json({ message: "profile image updated", key });
+      .json({ message: "profile image updated  successfully",url,key });
   };
 
 

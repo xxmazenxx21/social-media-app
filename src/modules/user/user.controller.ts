@@ -23,7 +23,7 @@ router.post(
 router.patch(
   "/profileimageUpload",
   authentication(endpoints.profileImage, tokentypeEnum.Access),
-  cloudUpload({ storageApproach:StorageEnum.MEMORY , validation:fileValidation.image}).single("profileImage"),
+  cloudUpload({ storageApproach:StorageEnum.MEMORY , validation:fileValidation.image}).single("image"),
   userService.profileImage
 );
 

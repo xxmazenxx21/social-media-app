@@ -1,4 +1,5 @@
 import mongoose, { HydratedDocument, model, models, Types } from "mongoose" 
+import { generateHash } from "../../utils/security/hash";
 
 
 export enum genderEnum {
@@ -66,6 +67,14 @@ this.set({firstName,lastName})
 })
 .get(function(){
     return `${this.firstName} ${this.lastName}`
+})
+
+
+userSchema.pre("save",async function(next){
+    if(this.isModified("password")){
+this.password = await generateHash(this.password); 
+    }
+    next();
 })
 
 
