@@ -23,7 +23,7 @@ video : ["video/mp4","video/3gpp","video/quicktime"],
 export const cloudUpload  = ({storageApproach = StorageEnum.DISK,validation=[],maxsize=5}:{storageApproach?:StorageEnum , validation?:string[],maxsize?:number}):Multer=>{
 
 
-console.log(os.tmpdir());
+
 
 const storage = storageApproach == StorageEnum.MEMORY?  multer.memoryStorage() :multer.diskStorage({
     destination : os.tmpdir(),

@@ -8,7 +8,7 @@ import { UserModel } from "../../DB/Models/User.model";
 import { createLoginCredentials } from "../../utils/token/token";
 import { HUserDocument } from "../../DB/Models/User.model";
 import { JwtPayload } from "jsonwebtoken";
-import { PreSignedUrl, uploadFile, uploadFiles } from "../../utils/mullter/s3.config";
+import { PreSignedUrl, uploadFiles } from "../../utils/mullter/s3.config";
 
 class UserService {
   constructor() {}
@@ -31,7 +31,12 @@ class UserService {
       .json({ message: "user profile", user: req.user, decoded: req.decoded });
   };
 
-
+// sign up  /patrent  
+// -sign up child
+//  login 
+// resetpassword 
+// forgetpassword 
+// confirm email
 
 
 

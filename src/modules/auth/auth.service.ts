@@ -3,8 +3,8 @@ import { ISignupDTO } from "./auth.dto";
 import { UserModel } from "../../DB/Models/User.model";
 import { ConfilectException, NotFoundException,BadRequestException } from "../../utils/response/error.response";
 import { UserRepository } from "../../DB/repositories/User.repository";
-import { compareHash,  generateHash } from "../../utils/security/hash";
-import { emailEvent } from "../../utils/events/sendEmail.event";
+import { compareHash } from "../../utils/security/hash";
+
 import { generateotp } from "../../utils/generate.otp";
 import { createLoginCredentials} from "../../utils/token/token"
 
@@ -36,14 +36,14 @@ class AuthenticationService {
         {
           username,
           email,
-          password: await generateHash(password),
-          confirmEmailOTP: await generateHash(String(otp)),
+          password,
+          confirmEmailOTP: `${otp}`,
         },
       ],
       options: { validateBeforeSave: true },
     });
 
-    emailEvent.emit("Confirmemail", { to: email, username,otp });
+   
 
     return res.status(200).json({ message: "user signup succesfuly", user });
   };

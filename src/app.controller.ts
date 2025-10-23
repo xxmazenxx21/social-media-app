@@ -5,8 +5,9 @@ import {config} from 'dotenv';
 import cors from 'cors'
 import helmet from 'helmet';
 import rateLimit  ,  {RateLimitRequestHandler}from 'express-rate-limit';
-import authRouter from './modules/auth/auth.controller';        
+import authRouter from './modules/auth/auth.controller'      
 import userRouter from './modules/user/user.controller';
+import postRouter from './modules/post/post.controller';
 import { BadRequestException, ErrorHandler } from './utils/response/error.response';
 import connectDB from './DB/connection';
 import { deleteFile, getFile, PreSignedUrlGet } from './utils/mullter/s3.config';
@@ -91,7 +92,7 @@ app.get('/delete-file',async(req:Request,res:Response)=>{
 
 app.use('/api/auth',authRouter);
 app.use('/api/user',userRouter);
-
+app.use('/api/post',postRouter);
 
 
 app.use(ErrorHandler);

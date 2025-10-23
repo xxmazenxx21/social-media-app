@@ -7,5 +7,4 @@ logOut : [RoleEnum.User,RoleEnum.Admin],
 refreshToken : [RoleEnum.User,RoleEnum.Admin],
 profileImage : [RoleEnum.User,RoleEnum.Admin],
 
-
 }

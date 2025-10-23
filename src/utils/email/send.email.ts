@@ -10,7 +10,6 @@ export const SendEmail = async (data:Mail.Options) => {
     if(!data.html&& !data.text && !data.attachments?.length) throw new BadRequestException("html or text or attachments is required");
 
 const transporter: Transporter<SMTPTransport.SentMessageInfo, SMTPTransport.Options>  = createTransport({
-   
     service: "gmail"
     , auth :{
         user:process.env.EMAIL,
@@ -19,7 +18,7 @@ const transporter: Transporter<SMTPTransport.SentMessageInfo, SMTPTransport.Opti
 })
 
 
-const info = await transporter.sendMail({...data,from:`"hello from social media"  <${process.env.EMAIL}>`,})
+return await transporter.sendMail({...data,from:`"hello from social media"  <${process.env.EMAIL}>`,})
 
 
 }
