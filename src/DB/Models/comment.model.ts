@@ -1,4 +1,5 @@
 import mongoose, { HydratedDocument, model, models, Types } from "mongoose" 
+import { IPost } from "./post.model";
 
 
 
@@ -10,7 +11,7 @@ export  interface Icomment  {
 content?: string;
 
 attachments?:string[];
-postid:Types.ObjectId;
+postid:Types.ObjectId|Partial<IPost> ;
 commentid?:Types.ObjectId;
 tags?:Types.ObjectId[];
 likes?:Types.ObjectId[];
@@ -36,7 +37,7 @@ export const commentSchema = new mongoose.Schema<Icomment>({
     }
   },
 postid : {type : mongoose.Schema.Types.ObjectId , ref:"Post"},
-commentid : {type : mongoose.Schema.Types.ObjectId , ref:"User"},
+commentid : {type : mongoose.Schema.Types.ObjectId , ref:"Comment"},
   attachments : [String],
 
   tags : [{type : mongoose.Schema.Types.ObjectId , ref:"User"}],
@@ -57,5 +58,5 @@ commentid : {type : mongoose.Schema.Types.ObjectId , ref:"User"},
 
 
 
-export const CommentModel = models.Post || model<Icomment>("Comment",commentSchema);
+export const CommentModel = models.comment || model<Icomment>("Comment",commentSchema);
 

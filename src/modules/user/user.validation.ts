@@ -1,5 +1,6 @@
 import z from 'zod' 
 import { logOutEnum } from '../../utils/token/token'
+import { generalfields } from '../../middelwares/validation.middelware'
 
 
 export const logoutSchema = {
@@ -13,3 +14,25 @@ export const logoutSchema = {
    
    }
    
+export const FriendRequest = {
+
+   params:z.strictObject({
+    
+      userid : generalfields.id
+     
+   }),
+   
+
+   
+   }
+   
+
+      
+export const acceptRequest = {
+
+   params:z.strictObject({
+    
+      requestid : generalfields.id
+     
+   }),
+}

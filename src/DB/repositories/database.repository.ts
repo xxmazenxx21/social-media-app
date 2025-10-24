@@ -36,7 +36,7 @@ export abstract class DatabaseRepository<TDocument> {
     options?: QueryOptions<TDocument> | null;
     select?: ProjectionType<TDocument> | null;
   }): Promise<any | HydratedDocument<TDocument> | null> {
-    const doc = this.model.findOne(filter).select(select || "");
+    const doc = this.model.findOne(filter,select,options);
     if (options?.populate) {
       doc.populate(options.populate as PopulateOptions[]);
     }

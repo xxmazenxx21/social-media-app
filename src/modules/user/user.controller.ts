@@ -4,6 +4,8 @@ import userService from "./user.service";
 import { endpoints } from "./user.authorization";
 import { cloudUpload, fileValidation, StorageEnum } from "../../utils/mullter/cloud.multer";
 import { tokentypeEnum } from "../../utils/token/token";
+import { validation } from "../../middelwares/validation.middelware";
+import * as validators from "./user.validation";
 
 
 
@@ -34,6 +36,28 @@ router.patch(
     cloudUpload({ storageApproach:StorageEnum.MEMORY , validation:fileValidation.image}).array("Images",10),
     userService.coverimagesUpload
   );
+
+
+
+
+router.post(
+  "/:userid/Friend-Request",
+  authentication(endpoints.friendRequest, tokentypeEnum.Access),
+  validation(validators.FriendRequest),
+  userService.sendFriendRequest
+);
+
+
+
+
+router.patch(
+  "/:requestid/accept-Request",
+  authentication(endpoints.acceptRequest, tokentypeEnum.Access),
+  validation(validators.acceptRequest),
+  userService.AcceptFriendRequest
+);
+
+
 
 
 
