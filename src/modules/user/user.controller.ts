@@ -6,12 +6,12 @@ import { cloudUpload, fileValidation, StorageEnum } from "../../utils/mullter/cl
 import { tokentypeEnum } from "../../utils/token/token";
 import { validation } from "../../middelwares/validation.middelware";
 import * as validators from "./user.validation";
-
+import chatRouter from "../chat/chat.controller";
 
 
 
 const router = Router();
-
+router.use('/:userid/chat',chatRouter)
 router.get("/profile", authentication(endpoints.profile), userService.profile);
 
 router.post("/log-out", authentication(endpoints.logOut), userService.logOut);

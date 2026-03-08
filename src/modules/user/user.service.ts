@@ -12,6 +12,8 @@ import { PreSignedUrl, uploadFiles } from "../../utils/mullter/s3.config";
 import { FriendRepository } from "../../DB/repositories/friend.repository";
 import { Friendmodel } from "../../DB/Models/FriendRequest.model";
 import { BadRequestException, ConfilectException, NotFoundException } from "../../utils/response/error.response";
+import { ChatRepository } from "../../DB/repositories/chat.repository";
+import { ChatModel } from "../../DB/Models/chat.model";
 class UserService {
   constructor() {}
 
@@ -20,6 +22,7 @@ class UserService {
 
 private _Freindmodel = new FriendRepository(Friendmodel);
 
+private _Chatmodel = new ChatRepository(ChatModel);
 
 
 
@@ -28,17 +31,17 @@ private _Freindmodel = new FriendRepository(Friendmodel);
     res: Response,
     next: NextFunction
   ): Promise<Response> => {
+    await req.user?.populate("friends");
+    const groups = await this._Chatmodel.find({
+      filter:{
+        participants:{$in:[req.user?._id as Types.ObjectId]},
+        group:{$exists:true}
+      }
+    })
     return res
       .status(200)
-      .json({ message: "user profile", user: req.user, decoded: req.decoded });
+      .json({ message: "user profile", user: req.user, decoded: req.decoded, groups });
   };
-
-// sign up  /patrent  
-// -sign up child
-//  login 
-// resetpassword 
-// forgetpassword 
-// confirm email
 
 
 
@@ -177,57 +180,42 @@ if(!friend) throw new ConfilectException("something went wrong");
 
   
 
-  
   AcceptFriendRequest = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<Response> => {
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response> => {
 
-const {requestid} = req.params as unknown as {requestid:Types.ObjectId} ;
+  const { requestid } = req.params as unknown as { requestid: Types.ObjectId };
 
-const checkFriendRequest = await this._Freindmodel.findOneAndUpdate({
-  filter:{
-  _id:requestid ,
-  createdby:req.user?.id
-  },
-  update:{
-      AcceptedAt:new Date()
- 
+  // لازم اللي يقبل يكون هو sendTo
+  const checkFriendRequest = await this._Freindmodel.findOneAndUpdate({
+    filter: {
+      _id: requestid,
+      sendTo: req.user?.id,
+      AcceptedAt: { $exists: false }
+    },
+    update: { AcceptedAt: new Date() },
+    options: { new: true }
+  });
+
+  if (!checkFriendRequest) {
+    throw new BadRequestException("request not found or already accepted");
   }
 
-})
+  await Promise.all([
+    this._usermodel.updateOne({
+      filter: { _id: checkFriendRequest.createdby },
+      update: { $addToSet: { friends: checkFriendRequest.sendTo } }
+    }),
+    this._usermodel.updateOne({
+      filter: { _id: checkFriendRequest.sendTo },
+      update: { $addToSet: { friends: checkFriendRequest.createdby } }
+    })
+  ]);
 
-if(!checkFriendRequest)  throw new BadRequestException("request not found");
-
-
-await Promise.all([
-  await this._usermodel.updateOne({
-    filter:{
-      _id:checkFriendRequest.createdby
-    },
-    update:{
-      $addToSet:{friends:checkFriendRequest.sendTo}
-    }
-
-  }),
-   await this._usermodel.updateOne({
-    filter:{
-      _id:checkFriendRequest.sendTo
-    },
-    update:{
-      $addToSet:{friends:checkFriendRequest.createdby}
-    }
-
-  })
-])
-
-
-    return res
-      .status(201)
-      .json({ message: "accepted successfully"  });
-  };
-
+  return res.status(200).json({ message: "accepted successfully" });
+};
 
 
 

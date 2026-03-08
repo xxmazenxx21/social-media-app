@@ -63,7 +63,7 @@ if(!compareHash(password,user.password))
 
 const Creadentials = await createLoginCredentials(user);
 
-    return res.status(200).json({ message: "user login succesfuly",Creadentials });
+    return res.status(200).json({ message: "User Logged in successfully",Creadentials });
   };
 
 

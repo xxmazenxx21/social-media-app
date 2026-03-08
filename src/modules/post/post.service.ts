@@ -7,7 +7,7 @@ import {
   PostModel,
 } from "../../DB/Models/post.model";
 import { UserRepository } from "../../DB/repositories/User.repository";
-import { HUserDocument, UserModel } from "../../DB/Models/User.model";
+import {  UserModel } from "../../DB/Models/User.model";
 import {
   BadRequestException,
   NotFoundException,

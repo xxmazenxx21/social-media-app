@@ -8,11 +8,13 @@ import rateLimit  ,  {RateLimitRequestHandler}from 'express-rate-limit';
 import authRouter from './modules/auth/auth.controller'      
 import userRouter from './modules/user/user.controller';
 import postRouter from './modules/post/post.controller';
+import chatRouter from './modules/chat/chat.controller';
 import { BadRequestException, ErrorHandler } from './utils/response/error.response';
 import connectDB from './DB/connection';
 import { deleteFile, getFile, PreSignedUrlGet } from './utils/mullter/s3.config';
 import { promisify } from 'node:util';
 import { pipeline } from 'node:stream';
+import { intilize } from './modules/Gateway/gateway';
 const S3createReadeStream  = promisify(pipeline);
 config({path:path.resolve('./config/.env.dev')});
 
@@ -93,12 +95,24 @@ app.get('/delete-file',async(req:Request,res:Response)=>{
 app.use('/api/auth',authRouter);
 app.use('/api/user',userRouter);
 app.use('/api/post',postRouter);
+app.use('/api/chat',chatRouter);
 
 
 app.use(ErrorHandler);
 
 
-app.listen(port,()=>{
+const httpServer = app.listen(port,()=>{
     console.log(`Server is running on port ${port}`);
 })
-}
+
+
+
+
+intilize(httpServer);
+
+
+
+
+
+
+};
